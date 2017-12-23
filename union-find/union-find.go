@@ -13,6 +13,7 @@ type QuickFindUF struct {
 }
 
 var id []int
+var sz []int
 
 func StrStdin() (stringInput string) {
 	scanner := bufio.NewScanner(os.Stdin)
@@ -40,7 +41,16 @@ func root(i int) int {
 func (n QuickFindUF) Union(p int, q int) error {
 	i := root(p)
 	j := root(q)
-	id[i] = j
+	if i == j {
+		return nil
+	}
+	if sz[i] < sz[j] {
+		id[i] = j
+		sz[j] += sz[i]
+	} else {
+		id[j] = i
+		sz[i] += sz[j]
+	}
 	return nil
 }
 
@@ -58,6 +68,7 @@ func main() {
 	uf := QuickFindUF{n}
 	for i := 0; i < uf.n; i++ {
 		id = append(id, i)
+		sz = append(sz, 1)
 	}
 
 	fmt.Printf("Array: %v\n", id)
@@ -86,7 +97,8 @@ func main() {
 		if !uf.Connected(p, q) {
 			uf.Union(p, q)
 			fmt.Printf("%d %d\n", p, q)
-			fmt.Printf("Array: %v\n", id)
+			fmt.Printf("Array:\t%v\n", id)
+			fmt.Printf("Size:\t%v\n", sz)
 		}
 	}
 }
