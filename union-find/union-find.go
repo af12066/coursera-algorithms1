@@ -27,19 +27,25 @@ func IntStdin() (int, error) {
 	return strconv.Atoi(strings.TrimSpace(stringInput))
 }
 
-func (n QuickFindUF) Union(p int, q int) error {
-	pid := id[p]
-	qid := id[q]
-	for i := 0; i < len(id); i++ {
-		if id[i] == pid {
-			id[i] = qid
+func root(i int) int {
+	for {
+		if i == id[i] {
+			break
 		}
+		i = id[i]
 	}
+	return i
+}
+
+func (n QuickFindUF) Union(p int, q int) error {
+	i := root(p)
+	j := root(q)
+	id[i] = j
 	return nil
 }
 
-func (n QuickFindUF) Connected(p int, q int) (bool, error) {
-	return id[p] == id[q], nil
+func (n QuickFindUF) Connected(p int, q int) bool {
+	return root(p) == root(q)
 }
 
 func main() {
@@ -77,8 +83,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		isConnected, err := uf.Connected(p, q)
-		if !isConnected {
+		if !uf.Connected(p, q) {
 			uf.Union(p, q)
 			fmt.Printf("%d %d\n", p, q)
 			fmt.Printf("Array: %v\n", id)
