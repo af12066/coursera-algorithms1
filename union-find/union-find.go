@@ -8,9 +8,11 @@ import (
 	"strings"
 )
 
-type UF struct {
+type QuickFindUF struct {
 	n int
 }
+
+var id []int
 
 func StrStdin() (stringInput string) {
 	scanner := bufio.NewScanner(os.Stdin)
@@ -25,12 +27,19 @@ func IntStdin() (int, error) {
 	return strconv.Atoi(strings.TrimSpace(stringInput))
 }
 
-func (n UF) Union(p int, q int) error {
+func (n QuickFindUF) Union(p int, q int) error {
+	pid := id[p]
+	qid := id[q]
+	for i := 0; i < len(id); i++ {
+		if id[i] == pid {
+			id[i] = qid
+		}
+	}
 	return nil
 }
 
-func (n UF) Connected(p int, q int) (bool, error) {
-	return false, nil
+func (n QuickFindUF) Connected(p int, q int) (bool, error) {
+	return id[p] == id[q], nil
 }
 
 func main() {
@@ -40,7 +49,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	uf := UF{n}
+	uf := QuickFindUF{n}
+	for i := 0; i < uf.n; i++ {
+		id = append(id, i)
+	}
+
+	fmt.Printf("Array: %v\n", id)
 
 	for {
 		stdin := StrStdin()
@@ -67,6 +81,7 @@ func main() {
 		if !isConnected {
 			uf.Union(p, q)
 			fmt.Printf("%d %d\n", p, q)
+			fmt.Printf("Array: %v\n", id)
 		}
 	}
 }
